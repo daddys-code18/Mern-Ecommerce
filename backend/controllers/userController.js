@@ -17,7 +17,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
   const token = user.getJWTToken();
-  console.log(token);
   res.status(201).json({
     success: true,
     token,
@@ -33,16 +32,16 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   if (!email || !password) {
     return next(new ErroHandler("Please Enter Email $ Password", 400));
   }
-  const user = User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
   if (!user) {
     return next(new ErroHandler(" Invalid Email & Password", 401));
   }
-  const isPasswordMatched = user.comparePassword();
+  const isPasswordMatched = await user.comparePassword(password);
+
   if (!isPasswordMatched) {
     return next(new ErroHandler(" Invalid Email 0r Password", 401));
   }
   const token = user.getJWTToken();
-  console.log(token);
   res.status(200).json({
     success: true,
     token,
